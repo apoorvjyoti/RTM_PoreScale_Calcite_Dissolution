@@ -1,0 +1,296 @@
+{
+	"iCP" : {
+		"inputFileVersion" : "1.0",
+		"loggerLevel" : "verbose",
+		"runner" : {
+			"problemIdSequence" : [
+				"problem1"
+			],
+			"restart" : {
+				"isActive" : false,
+				"checkPointId" : "checkpoint1",
+				"checkPointStep" : 1
+			}
+		},
+		"problemList" : {
+			"problem1" : {
+				"timeStepId" : "timeStep1",
+				"checkPointIds" : ["checkpoint1"],
+				"studyId" : "firstStudy",
+				"domainIds" : ["domainId1", "BCwaterId1"],
+				"variableIds" : {
+					"fromComsolToPhreeqc" :
+					[],
+					"fromPhreeqcToComsol" :
+					["H_coupling",
+					 "CaAct_coupling",
+					 "CO3Act_coupling",
+					 "HAct_coupling",
+					 "H2CO3Act_coupling",
+					 "CO2Aq_coupling",
+					"selectedOutput"],
+					"bothDirections" :
+					["aqueousComponents"]
+				}
+			}
+		},
+		"timeStepList" : {
+			"timeStep1" : [{
+					"type" : "linear",
+					"units" : "seconds",
+					"initialTime" : 0,
+					"endTime" : 40000,
+					"numOfIntervals" : 20,
+					"storeSolutionFrequency" : 2,
+					"writeOutputFileToDiskFrequency" : 50
+				}
+			]
+		},
+		"checkPointList" : {
+			"checkpoint1" : {
+				"units" : "seconds",
+				"times" : [2],
+				"path" : "checkPoint"
+			}
+		}
+	},
+	"comsolRT" : {
+		"inputFileVersion" : "3.0",
+		"globalSettings" : {
+			"inputFile" : "comsol/input.mph",
+			"resultsFileName" : "results/myOutput.mph",
+			"componentTag" : "comp1"
+		},
+		"comsolServer" : {
+			"portNumber" : 2037,
+			"hostName" : "localhost",
+			"showProgress" : true
+		},
+		"studyList" : {
+			"firstStudy" : {
+				"studyTag" : "std1",
+				"masterSolverName" : "masterSolver",
+				"solverSequence" : [
+					{
+						"name":"commonVariables",
+						"solverTag":"sol1",
+						"mustBeSolved":false,
+						"physicsIds":["commonVars"],
+						"stepTag":"time"
+					},{
+						"name":"flowSolver",
+						"solverTag":"sol2",
+						"mustBeSolved":true,
+						"stepTag":"stat"
+					}, {
+						"name" : "masterSolver",
+						"solverTag" : "sol3",
+						"mustBeSolved" : true,
+						"physicsIds" : ["liquidSoluteTransportInterface"],
+						"stepTag" : "time2"
+					}, {
+						"name" : "resultsSolver",
+						"solverTag" : "sol4",
+						"mustBeSolved" : false,
+						"physicsIds" : ["results"],
+						"physicsDomainId" : ["allDomains"],
+						"stepTag" : "time3"
+					}
+				]
+			}
+		},
+		"physicsList" : {
+			"liquidSoluteTransportInterface" : {
+				"type" : "iCP_soluteTransport",
+				"tag" : "ist"
+			},
+			"commonVars":{
+				"type":"iCP_results",
+				"tag":"irs"
+			},
+			"results" : {
+				"type" : "iCP_results",
+				"tag" : "irs2"
+			}
+		},
+		"domainList" : {
+			"domainId1" : {
+				"type" : "selection",
+				"tag" : "sel1"
+			},
+			"BCwaterId1" : {
+				"type" : "boundaryCondition",
+				"relatedPhyicsInfo" : [{
+						"physicsId" : "liquidSoluteTransportInterface",
+						"tag" : "opb1"
+					}
+				]
+			}
+		},
+		"variableList" : {
+			"H_coupling":{
+				"type":"physicsUnknown",
+				"name":"h_ions",
+				"physicsId":"commonVars"			
+			},
+			"CaAct_coupling":{
+				"type":"physicsUnknown",
+				"name":"CaAct",
+				"physicsId":"commonVars"			
+			},
+			"CO3Act_coupling":{
+				"type":"physicsUnknown",
+				"name":"CO3Act",
+				"physicsId":"commonVars"			
+			},
+			"HAct_coupling":{
+				"type":"physicsUnknown",
+				"name":"HAct",
+				"physicsId":"commonVars"			
+			},
+			"H2CO3Act_coupling":{
+				"type":"physicsUnknown",
+				"name":"H2CO3Act",
+				"physicsId":"commonVars"			
+			},
+			"CO2Aq_coupling":{
+				"type":"physicsUnknown",
+				"name":"CO2Aq",
+				"physicsId":"commonVars"			
+			},
+			"selectedOutput" : {
+				"type" : "physicsUnknownSet",
+				"name" : "tempNameSelOut",
+				"physicsId" : "results"
+			},
+			"aqueousComponents" : {
+				"type" : "physicsUnknownSet",
+				"name" : "tempNameAqComps",
+				"physicsId" : "liquidSoluteTransportInterface"
+			}
+		}
+	},
+
+	"phreeqcRocks" : {
+		"inputFileVersion" : "4.0",
+		"studyList" : {
+			"firstStudy" : {
+				"parallelizationManager" : {
+					"numberOfThreads" : 4,
+					"numberOfAvailableLibraries" : 5
+				}
+			}
+		},
+		"domainList" : {
+			"domainId1" : {
+				"pathId" : "phreeqcInputPath1",
+				"databaseId" : "phreeqcDB1",
+				"inputFileId" : "phreeqcFile1",
+				"selectedOutputId" : "output1",
+				"numericalManagerId" : "myNumericalManager1",
+				"numberOfSlices" : 4
+			},
+			"BCwaterId1" : {
+				"pathId" : "phreeqcInputPath1",
+				"databaseId" : "phreeqcDB1",
+				"inputFileId" : "phreeqcFileBC",
+				"selectedOutputId" : "output1",
+				"numericalManagerId" : "myNumericalManager1",
+				"numberOfSlices" : 1
+			}
+		},
+		"variableList" : {
+			"H_coupling":{
+				"type":"outputComponent",
+				"keyword":"molalities",
+				"name":"H+"		
+			},
+			"CaAct_coupling":{
+				"type":"outputComponent",
+				"keyword":"punch",
+				"name":"actcalcium"		
+			},
+			"CO3Act_coupling":{
+				"type":"outputComponent",
+				"keyword":"punch",
+				"name":"actcarbonate"		
+			},
+			"HAct_coupling":{
+				"type":"outputComponent",
+				"keyword":"punch",
+				"name":"acthydrogen"		
+			},
+			"H2CO3Act_coupling":{
+				"type":"outputComponent",
+				"keyword":"punch",
+				"name":"actH2CO3"		
+			},
+			"CO2Aq_coupling":{
+				"type":"outputComponent",
+				"keyword":"punch",
+				"name":"actCO2Aq"		
+			},
+			"selectedOutput" : {
+				"type" : "selected_output_all"
+			},
+			"aqueousComponents" : {
+				"type" : "all_transported_components"
+			}
+		},
+		"pathList" : {
+			"phreeqcInputPath1" : "phreeqc"
+		},
+		"dataBaseList" : {
+			"phreeqcDB1" : {
+				"pathId" : "phreeqcInputPath1",
+				"phreeqcDatabase" : "phreeqc.dat"
+			}
+		},
+		"inputFileList" : {
+			"phreeqcFile1"       : "DomainWater.pqi",
+			"phreeqcFileBC"      : "boundaryWater.pqi"
+		},
+		"selectedOutputList" : {
+			"output1" : {
+				"activities" : [],
+				"molalities" : ["H+","HCO3-","CO2","CaHCO3+","CaCO3","CO3-2","Ca+2"],
+				"totals" : ["Na","C","Ca","Cl"],
+				"equilibrium_phases" : [],
+				"equilibrium_phases_delta" : [],
+				"saturation_indices" : ["Calcite"],
+				"kinetic_reactants" : [],
+				"kinetic_reactants_delta" : [],
+				"solid_solutions" : [],
+				"gases" : [],
+				"general" : [
+					"pH"
+				],
+				"punch" : 
+				[{"name": "actcalcium",
+				 "definition" : "ACT('Ca+2')"},
+				 {"name": "actcarbonate",
+				 "definition" : "ACT('CO3-2')"},
+				 {"name": "acthydrogen",
+				 "definition" : "ACT('H+')"},
+				 {"name": "actH2CO3",
+				 "definition" : "ACT('H2CO3')"},
+				 {"name": "actCO2Aq",
+				 "definition" : "ACT('CO2')"}],
+				"extended" : []
+			}
+		},
+		"numericalManagerList" : {
+			"myNumericalManager1" : {
+				"concentrationLimiter" : {
+					"isActive" : true,
+					"maxLimit" : 1e15,
+					"minLimit" : 1e-40
+				},
+				"recalculationCriterium" : {
+					"isActive" : false,
+					"relativeConcentrationChange" : 1e-3,
+					"absoluteConcentrationChange" : 1e-8,
+					"minimumValue" : 1e-10
+				},
+				"stopIfConvergenceProblems" : false
+			}   }  }   }
